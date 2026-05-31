@@ -85,6 +85,69 @@ graph TD
 
 ---
 
+## 🔁 Data Flow (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+      participant U as User
+      participant UI as React UI
+      participant API as FastAPI
+      participant DB as PostgreSQL
+
+      U->>UI: Login / Signup
+      UI->>API: POST /auth/login
+      API->>DB: Verify user + role
+      DB-->>API: User + role
+      API-->>UI: JWT token
+      UI->>API: GET /projects (Bearer token)
+      API->>DB: RBAC + fetch projects
+      DB-->>API: Projects
+      API-->>UI: Project list
+```
+
+---
+
+## 🧩 ERD (Entity Relationship Diagram)
+
+```mermaid
+erDiagram
+      USERS ||--o{ PROJECTS : creates
+      ROLES ||--o{ USERS : assigns
+      ROLES ||--o{ ROLE_PERMISSIONS : maps
+      PERMISSIONS ||--o{ ROLE_PERMISSIONS : maps
+
+      USERS {
+         int id
+         string name
+         string email
+         string password_hash
+         int role_id
+      }
+      ROLES {
+         int id
+         string role_name
+      }
+      PERMISSIONS {
+         int id
+         string name
+         string description
+      }
+      ROLE_PERMISSIONS {
+         int role_id
+         int permission_id
+      }
+      PROJECTS {
+         int id
+         string name
+         string vehicle_platform
+         string odd_type
+         string status
+         int created_by
+      }
+```
+
+---
+
 ## ⚡ Setup & Execution Guide
 
 ### 1. Database Provisioning
