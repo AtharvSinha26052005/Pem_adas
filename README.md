@@ -19,29 +19,6 @@ It provides an interactive React-based dashboard connected to a high-performance
 
 ---
 
-## 📸 Screenshots
-
-### Authentication
-
-![Sign In](Screenshots/signin.png.png)
-![Sign Up](Screenshots/signup.png.png)
-
-### Dashboard and Workspace
-
-![Dashboard](Screenshots/dashboard.png.png)
-![Workspace](Screenshots/workspace.png.png)
-
-### Projects and Admin
-
-![Create Project](Screenshots/create_project.png.png)
-![Admin Page](Screenshots/admin_page.png.png)
-
-### AI Report
-
-![AI Report](Screenshots/AI_report.png.png)
-
----
-
 ## 🛠️ Technology Stack
 
 ### Backend
@@ -55,96 +32,6 @@ It provides an interactive React-based dashboard connected to a high-performance
 - **Styling**: Tailwind CSS v3
 - **Tooling**: Vite
 - **Icons**: Lucide React
-
----
-
-## 📁 System Architecture
-
-```mermaid
-graph TD
-    subgraph Frontend [React SPA - Port 5173]
-        UI[Tailwind UI] --> Auth[AuthContext]
-        UI --> API[API Service]
-        Auth --> LS[(Local Storage)]
-    end
-
-    subgraph Backend [FastAPI - Port 8000]
-        API --> Routes[API Routers]
-        Routes --> AuthRoute[POST /auth/login]
-        Routes --> UserRoute[PUT /users/id/role]
-        Routes --> ProjectRoute[PUT /projects/id]
-        
-        Routes --> RBAC[RBAC Middleware]
-        RBAC --> CRUD[CRUD Controllers]
-    end
-
-    subgraph Database [PostgreSQL - Port 5432]
-        CRUD --> PG[(PostgreSQL DB)]
-    end
-```
-
----
-
-## 🔁 Data Flow (Sequence Diagram)
-
-```mermaid
-sequenceDiagram
-      participant U as User
-      participant UI as React UI
-      participant API as FastAPI
-      participant DB as PostgreSQL
-
-      U->>UI: Login / Signup
-      UI->>API: POST /auth/login
-      API->>DB: Verify user + role
-      DB-->>API: User + role
-      API-->>UI: JWT token
-      UI->>API: GET /projects (Bearer token)
-      API->>DB: RBAC + fetch projects
-      DB-->>API: Projects
-      API-->>UI: Project list
-```
-
----
-
-## 🧩 ERD (Entity Relationship Diagram)
-
-```mermaid
-erDiagram
-      USERS ||--o{ PROJECTS : creates
-      ROLES ||--o{ USERS : assigns
-      ROLES ||--o{ ROLE_PERMISSIONS : maps
-      PERMISSIONS ||--o{ ROLE_PERMISSIONS : maps
-
-      USERS {
-         int id
-         string name
-         string email
-         string password_hash
-         int role_id
-      }
-      ROLES {
-         int id
-         string role_name
-      }
-      PERMISSIONS {
-         int id
-         string name
-         string description
-      }
-      ROLE_PERMISSIONS {
-         int role_id
-         int permission_id
-      }
-      PROJECTS {
-         int id
-         string name
-         string vehicle_platform
-         string odd_type
-         string status
-         int created_by
-      }
-```
 
 ---
 
@@ -216,6 +103,102 @@ CREATE DATABASE adas_platform;
 
 ---
 
+## 📁 System Architecture
+
+This diagram shows the high-level components and how the UI, backend, and database connect.
+
+```mermaid
+graph TD
+    subgraph Frontend [React SPA - Port 5173]
+        UI[Tailwind UI] --> Auth[AuthContext]
+        UI --> API[API Service]
+        Auth --> LS[(Local Storage)]
+    end
+
+    subgraph Backend [FastAPI - Port 8000]
+        API --> Routes[API Routers]
+        Routes --> AuthRoute[POST /auth/login]
+        Routes --> UserRoute[PUT /users/id/role]
+        Routes --> ProjectRoute[PUT /projects/id]
+        
+        Routes --> RBAC[RBAC Middleware]
+        RBAC --> CRUD[CRUD Controllers]
+    end
+
+    subgraph Database [PostgreSQL - Port 5432]
+        CRUD --> PG[(PostgreSQL DB)]
+    end
+```
+
+---
+
+## 🔁 Data Flow (Sequence Diagram)
+
+This sequence shows the runtime flow for login and fetching projects with RBAC enforced.
+
+```mermaid
+sequenceDiagram
+      participant U as User
+      participant UI as React UI
+      participant API as FastAPI
+      participant DB as PostgreSQL
+
+      U->>UI: Login / Signup
+      UI->>API: POST /auth/login
+      API->>DB: Verify user + role
+      DB-->>API: User + role
+      API-->>UI: JWT token
+      UI->>API: GET /projects (Bearer token)
+      API->>DB: RBAC + fetch projects
+      DB-->>API: Projects
+      API-->>UI: Project list
+```
+
+---
+
+## 🧩 ERD (Entity Relationship Diagram)
+
+This diagram shows the data model and relationships between users, roles, permissions, and projects.
+
+```mermaid
+erDiagram
+      USERS ||--o{ PROJECTS : creates
+      ROLES ||--o{ USERS : assigns
+      ROLES ||--o{ ROLE_PERMISSIONS : maps
+      PERMISSIONS ||--o{ ROLE_PERMISSIONS : maps
+
+      USERS {
+         int id
+         string name
+         string email
+         string password_hash
+         int role_id
+      }
+      ROLES {
+         int id
+         string role_name
+      }
+      PERMISSIONS {
+         int id
+         string name
+         string description
+      }
+      ROLE_PERMISSIONS {
+         int role_id
+         int permission_id
+      }
+      PROJECTS {
+         int id
+         string name
+         string vehicle_platform
+         string odd_type
+         string status
+         int created_by
+      }
+```
+
+---
+
 ## 🧪 Verification & Automated Testing
 
 The backend includes comprehensive end-to-end integration tests validating all RBAC and Authentication rules.
@@ -274,3 +257,26 @@ The database also includes a `permissions` table and a `role_permissions` mappin
   - **Validation Engineer**: Can edit name, platform, and ODD on owned projects. Status is locked.
   - **Reviewer**: Can edit status field only. Text fields are locked.
   - **Viewer**: Read-only.
+
+---
+
+## 📸 Screenshots
+
+### Authentication
+
+![Sign In](Screenshots/signin.png.png)
+![Sign Up](Screenshots/signup.png.png)
+
+### Dashboard and Workspace
+
+![Dashboard](Screenshots/dashboard.png.png)
+![Workspace](Screenshots/workspace.png.png)
+
+### Projects and Admin
+
+![Create Project](Screenshots/create_project.png.png)
+![Admin Page](Screenshots/admin_page.png.png)
+
+### AI Report
+
+![AI Report](Screenshots/AI_report.png.png)
